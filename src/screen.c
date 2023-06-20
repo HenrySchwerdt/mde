@@ -3,13 +3,21 @@
 
 int renderScreenAt(screen *scr, buffer *buf, terminal *term, int row, int col)
 {
-    if (row >= scr->startRow && row <= scr->endRow && col >= scr->startCol && col <= scr->endCol)
+    if (row >= scr->startRow && row <= scr->endRow - 1 && col >= scr->startCol && col <= scr->endCol - 1)
     {
-        int isLeftScreen = scr->startCol == 0 && scr->endCol != term->screencols - 1;
+        int isTopScreen = scr->endRow != term->screenrows;
+        int isLeftScreen = scr->endCol != term->screencols;
         int isRightScreen = scr->startCol != 0;
         // Append Borders
         if (row == scr->startRow && col == scr->startCol)
         {
+            if (isRightScreen)
+            {
+                append(buf, scr->color, scr->colorLen);
+                append(buf, "─", 4);
+                append(buf, CRESET, 5);
+                return 1;
+            }
             append(buf, scr->color, scr->colorLen);
             append(buf, "┌", 4);
             append(buf, CRESET, 5);
@@ -32,6 +40,13 @@ int renderScreenAt(screen *scr, buffer *buf, terminal *term, int row, int col)
         }
         else if (row == scr->endRow - 1 && col == scr->startCol)
         {
+            if (isRightScreen)
+            {
+                append(buf, scr->color, scr->colorLen);
+                append(buf, "─", 4);
+                append(buf, CRESET, 5);
+                return 1;
+            }
             append(buf, scr->color, scr->colorLen);
             append(buf, "└", 4);
             append(buf, CRESET, 5);
@@ -70,16 +85,15 @@ int renderScreenAt(screen *scr, buffer *buf, terminal *term, int row, int col)
             append(buf, CRESET, 5);
             return 1;
         }
-        else if ((col == scr->endCol - 1) && (row != scr->startRow && row != scr->endRow - 1))
+        else if ((col == scr->endCol - 1) && (row != scr->startRow && row != scr->endRow))
         {
-
             append(buf, scr->color, scr->colorLen);
             append(buf, "│", 4);
             append(buf, CRESET, 5);
             return 1;
         }
         // Append lines
-        if ((col == scr->startCol + 1) && row != scr->startRow && row != scr->endRow - 1)
+        if ((col == scr->startCol + 1) && row != scr->startRow && row != scr->endRow)
         {
             append(buf, scr->color, scr->colorLen);
             append(buf, "~", 2);
