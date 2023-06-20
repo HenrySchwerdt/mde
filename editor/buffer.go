@@ -4,9 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"log"
-	mdeterm "mde/mdeTerm"
+	"mde/mdeterm"
 	"os"
 	"strings"
+
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type Buffer struct {
@@ -35,6 +37,22 @@ func (buffer *Buffer) Load() {
 		buffer.data = append(buffer.data, scanner.Text())
 	}
 	fmt.Println(buffer.GetData())
+}
+
+func (buffer *Buffer) SetFocus() {
+	oldState, err := terminal.MakeRaw(0)
+	if err != nil {
+		panic(err)
+	}
+	defer terminal.Restore(0, oldState)
+
+	for {
+		str, _ := buffer.ui.ReadInputByte()
+		if str == "q" {
+			break
+		}
+		fmt.Println(str)
+	}
 }
 
 func (buffer *Buffer) GetData() string {

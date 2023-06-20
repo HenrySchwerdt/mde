@@ -10,7 +10,7 @@ type UI struct {
 	Reader io.Reader
 }
 
-func newUI() *UI {
+func NewUI() *UI {
 	return &UI{
 		Writer: os.Stdout,
 		Reader: os.Stdin,
